@@ -1,2515 +1,434 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>笨蛋的小窝网盘</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
-        }
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>笨蛋的小窝资源库</title>
+	<style>
+		body {
+  background-image: url('https://cdn.panxp.com/img/2025/08/68b40c5f67f3a.jpg');
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
 
-        /* 黑暗模式 */
-        body.dark-mode {
-            background-color: #1a1a2e;
-            color: #ffffff;
-        }
+		.tox {
+			text-align: center;
+			margin-top: 20px;
+		}
 
-        body.dark-mode .bg-white {
-            background-color: #252a41;
-        }
+		.tox img {
+			width: 100px;
+			height: 100px;
+			border-radius: 5px;
+			transition: transform 0.5s;
+		}
 
-        body.dark-mode .text-gray-600 {
-            color: #bbbbcc;
-        }
+		.tox img:hover {
+			transform: rotateY(180deg);
+		}
 
-        body.dark-mode .border-gray-300 {
-            border-color: #4a5072;
-        }
+		.gnlieb {
+			display: flex;
+			justify-content: space-evenly;
+			margin-top: 20px;
+		}
 
-        /* 模态框样式 */
-        .modal {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: scale(0.9);
-            opacity: 0;
-        }
+		.gnlieb .card {
+			width: 150px;
+			height: 50px;
+			background-color: rgba(16, 52, 166, 0.7);
+			text-align: center;
+			border-radius: 10px;
+			font-size: 18px;
+			color: #fff;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		}
 
-        .modal.active {
-            transform: scale(1);
-            opacity: 1;
-        }
+		.gnlieb .card:hover {
+			background-color: rgba(16, 52, 166, 0.9);
+			cursor: pointer;
+			transition: background-color 0.3s ease-in-out;
+		}
 
-        /* 按钮悬停效果 */
-        button:hover {
-            transform: scale(1.05);
-            transition: transform 0.2s ease;
-        }
+		.gnlieb .card a {
+			color: #fff;
+			text-decoration: none;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+		}
 
-        /* 文件项样式 */
-        .file-item, .folder-item {
-            transition: background-color 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+#progress-bar {
+  width: 340px;
+  height: 10px;
+  border: 1px solid #ccc;
+  position: relative;
+  overflow: hidden;
+}
 
-        .file-item:hover, .folder-item:hover {
-            background-color: #f3f4f6;
-        }
-
-        body.dark-mode .file-item:hover, body.dark-mode .folder-item:hover {
-            background-color: #323854;
-        }
-
-        /* 新消息提示 */
-        .new-message-indicator {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 18px;
-            height: 18px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            color: white;
-            font-size: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* 自定义滚动条样式 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        body.dark-mode ::-webkit-scrollbar-track {
-            background: #252a41;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* 上传进度条样式 */
-        .progress-bar {
-            width: 100%;
-            background-color: #f3f4f6;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        body.dark-mode .progress-bar {
-            background-color: #323854;
-        }
-
-        .progress {
-            height: 20px;
-            background-color: #3b82f6;
-            width: 0%;
-            text-align: center;
-            line-height: 20px;
-            color: white;
-            border-radius: 4px;
-        }
-
-        /* 上传区域样式 */
-        .upload-area {
-            border: 2px dashed #3b82f6;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-area:hover {
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-
-        body.dark-mode .upload-area {
-            border-color: #60a5fa;
-        }
-
-        body.dark-mode .upload-area:hover {
-            background-color: rgba(96, 165, 250, 0.1);
-        }
-
-        /* 广告弹窗样式 */
-        #ad-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .ad-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        body.dark-mode .ad-content {
-            background-color: #252a41;
-        }
-
-        .ad-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #e53e3e;
-            margin-bottom: 20px;
-        }
-
-        .ad-message {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-        }
-
-        .ad-buttons {
-            display: flex;
-            justify-content: space-around;
-        }
-
-        .ad-button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* 大厅样式 */
-        .hall-section {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 好友列表样式 */
-        .friends-list {
-            margin-top: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .friend-item {
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        body.dark-mode .friend-item {
-            border-bottom-color: #4a5072;
-        }
-
-        /* 路径导航样式 */
-        .path-nav {
-            margin: 10px 0;
-            padding: 5px;
-            background-color: #f8fafc;
-            border-radius: 4px;
-        }
-
-        body.dark-mode .path-nav {
-            background-color: #323854;
-        }
-
-        .path-item {
-            display: inline-block;
-            margin-right: 5px;
-            cursor: pointer;
-            color: #3b82f6;
-        }
-
-        .path-separator {
-            display: inline-block;
-            margin-right: 5px;
-            color: #94a3b8;
-        }
-
-        /* 分类标签样式 */
-        .category-tag {
-            display: inline-block;
-            background-color: #e0f2fe;
-            color: #0284c7;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-right: 4px;
-        }
-
-        body.dark-mode .category-tag {
-            background-color: #1e3a8a;
-            color: #93c5fd;
-        }
-
-        /* 管理员操作按钮 */
-        .admin-action-btn {
-            color: #dc2626;
-            cursor: pointer;
-        }
-
-        .admin-action-btn:hover {
-            color: #b91c1c;
-        }
-
-        /* 搜索结果高亮 */
-        .search-highlight {
-            background-color: #fde68a;
-            font-weight: bold;
-        }
-
-        body.dark-mode .search-highlight {
-            background-color: #7c2d12;
-        }
-    </style>
+#progress-bar hr {
+  height: 100%;
+  width: 0;
+  background-color: #00aaff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.5s ease;
+}
+	</style>
 </head>
+<body>
+	<div class="tox">
+		<img src="https://cdn.panxp.com/img/2025/08/68af09224b516.png" alt="头像" />
+		<br /><br />
+		<h1>笨蛋的小窝资源库库</h1>
+	</div>
+<div id="progress-bar">
+  <hr>
+</div>
+
+<marquee id="v70">
+    笨蛋的小窝资源库@3615755928想进官方群请添加此QQ号
+  </marquee> 
+  <marquee id="v71">
+    笨蛋的小窝资源库@3615755928想进官方群请添加此QQ号
+  </marquee> 
+  <marquee id="v72">
+    笨蛋的小窝资源库@3615755928想进官方群请添加此QQ号
+  </marquee> 
+  <marquee id="v73">
+    笨蛋的小窝资源库@3615755928想进官方群请添加此QQ号
+  </marquee> 
+  <marquee id="v74">
+    笨蛋的小窝资源库@云盘密码请进官方群获得
+  </marquee> 
+  <marquee id="v75">
+    笨蛋的小窝资源库@云盘密码请进官方群获得
+  </marquee> 
+  <marquee id="v76">
+    笨蛋的小窝资源库@注意小飞机云盘点击文件才可以下载，强烈定义浏览器开启电脑模式
+  </marquee>
+
+
+
+
+
+
+<div class="gnlieb">
+		<div class="card">
+			<a href="https://qun.qq.com/universal-share/share?ac=1&authKey=p%2BrDtIaYfCw5lL17pfU7jX6FLzVX%2BJSGdiUynJaQ2Ajzbau3Se%2FFUy%2BAjNuNzfrr&busi_data=eyJncm91cENvZGUiOiI5NDgxMDQ4MDgiLCJ0b2tlbiI6InljMTRheEs0S2t0YXBuV3cyVXJnY2I1MEV3RGhxYXRac0dSNmE3bVphWGk5MUZLMUtuRWpnYmtERS92NU14OXEiLCJ1aW4iOiIzODY2NDI3Mzc4In0%3D&data=2lNUuaQYPpzsIzuoLXErIs3QljhQLBn_GLTNVMPeKZalZIBJdYahXxfI4QYmiGgQ4TUXTVyHrUvKuDk8ZFPq9Q&svctype=4&tempid=h5_group_info">点击添加官方群聊</a>
+		</div>
+		<div class="card">
+			<a href="https://share.feijipan.com/s/9vPEczxC">杨过游戏几个T文件</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://jank307.github.io/">笨蛋的小窝资源库官方下载</a>
+		</div>
+		<div class="card">
+			<a href="https://vlink.cc/bddxw">笨蛋的小窝官方回家的路</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://share.feijipan.com/s/olPEc4Q7">老司机学习软件</a>
+		</div>
+		<div class="card">
+			<a href="https://share.feijipan.com/s/mLPEdRdN">起飞软件(下载黄油的)</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://share.feijipan.com/s/E3PEbYoC">绅士视频</a>
+		</div>
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/">笨蛋的小窝官方论坛主页</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/%e9%bb%84%e6%b2%b9rpg/">笨蛋的小窝论坛RPG专区</a>
+		</div>
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/%e7%bb%85%e5%a3%ab%e8%bd%af%e4%bb%b6/">笨蛋的小窝论坛绅士软件专区</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/%e9%bb%84%e6%b2%b9slg/">笨蛋的小窝论坛Slg专区</a>
+		</div>
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/galgame/">笨蛋的小窝论坛Galgame专区</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/%e9%bb%84%e6%b2%b9act/">笨蛋的小窝论坛Act专区</a>
+		</div>
+		<div class="card">
+			<a href="https://wp3866427378-uatyd.wordpress.com/category/%e6%bc%ab%e7%94%bb%e4%b8%93%e5%8c%ba/">笨蛋的小窝论坛漫画专区</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://dl.sayafx.vip/">月瑶分享</a>
+		</div>
+		<div class="card">
+			<a href="https://alist-public.imoutoheaven.org/">YAAS仓库</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://catcat.cloud/">猫猫网盘</a>
+		</div>
+		<div class="card">
+			<a href="https://pan.cycg.xyz/">次元图书馆</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://naiyi.lanzoul.com/iCG3U30w1vkd">瑞游社区(蓝奏云)</a>
+		</div>
+		<div class="card">
+			<a href="https://nekobyran.lanzouw.com/b00yaftcyb">acg论坛应用合集</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://wwf.lanzoul.com/b00taq43ed">次元の世界</a>
+		</div>
+		<div class="card">
+			<a href="http://114.132.85.177/">游咔APP</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://cloudreve.tortinita.cc:8443/s/ENHn?path=%2F">少侠游戏库</a>
+		</div>
+		<div class="card">
+			<a href="http://xn--7ov9qu54b.top/">柒月社</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://link3.cc/3117849311">CY社区</a>
+		</div>
+		<div class="card">
+			<a href="https://zdfxdk.lanzouq.com/s/zdfxdk">老司机软件蓝奏云下载</a>
+		</div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  <div class="gnlieb">
+		<div class="card">
+			<a href="https://pixeldra.in/d/xBg1FPmX">老司鸡软件</a>
+		</div>
+		<div class="card">
+			<a href="https://tangpin01.com/">躺平资源库</a>
+		</div>
+  </div>
+<script>
+  var progressBar = document.querySelector("#progress-bar hr");
+  var width = 0;
+  var interval = setInterval(function() {
+    width += 5;
+    progressBar.style.width = width + "%";
+    if (width >= 100) {
+      clearInterval(interval);
+    }
+  }, 1000);
+
+ 
+</script>
+  <script src="https://cdn.staticfile.org/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" id='font-awesome-css' href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" type='text/css' media='all'>
+  <div id="music" key="645ddfcb2affe" api="https://music.caonm.net"></div><script id="xplayer" src="https://music.caonm.net/Static/player9/js/player.js" ></script>
 
-<body class="bg-gray-100">
-    <!-- 导航栏 -->
-    <nav class="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
-        <h1 class="text-2xl font-bold">笨蛋的小窝网盘</h1>
-        <div id="nav-actions" class="flex space-x-4">
-            <button id="login-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-md">登录</button>
-            <button id="register-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-md">注册</button>
-            <button id="theme-toggle" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-2 px-4 rounded-md">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
-    </nav>
-
-    <!-- 登录用户导航 -->
-    <div id="user-nav" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white flex justify-between items-center shadow-md">
-        <h1 class="text-2xl font-bold">笨蛋的小窝网盘</h1>
-        <div class="flex items-center space-x-4">
-            <div style="position: relative;">
-                <button id="notifications-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-1 px-3 rounded-md">
-                    <i class="fas fa-bell"></i>
-                    <span id="notification-indicator" class="new-message-indicator hidden">1</span>
-                </button>
-            </div>
-            <span id="nav-username" class="font-medium"></span>
-            <button id="logout-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-1 px-3 rounded-md">退出</button>
-            <button id="user-theme-toggle" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-1 px-3 rounded-md">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- 管理员菜单 -->
-    <div id="admin-menu" class="hidden bg-red-600 text-white p-2">
-        <div class="flex justify-between items-center">
-            <span><i class="fas fa-shield-alt"></i> 管理员功能</span>
-            <div>
-                <button id="manage-users-btn" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white py-1 px-3 rounded-md text-sm">
-                    管理用户
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 登录和注册模态框 -->
-    <div id="login-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="modal bg-white p-8 rounded-md shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4 text-center text-blue-600">登录</h2>
-            <input type="text" id="login-username" placeholder="用户名" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <input type="password" id="login-password" placeholder="密码" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <button id="login-submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-full rounded-md">登录</button>
-        </div>
-    </div>
-
-    <div id="register-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="modal bg-white p-8 rounded-md shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4 text-center text-blue-600">注册</h2>
-            <input type="text" id="register-username" placeholder="用户名" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <input type="password" id="register-password" placeholder="密码" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <button id="register-submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-full rounded-md">注册</button>
-        </div>
-    </div>
-
-    <!-- 广告弹窗 -->
-    <div id="ad-modal">
-        <div class="ad-content">
-            <div class="ad-title">笨蛋的小窝提醒你</div>
-            <div class="ad-message">网盘正在开发阶段，如有bug请添加2659728404</div>
-            <div class="ad-buttons">
-                <button id="ad-cancel" class="ad-button bg-gray-200 hover:bg-gray-300">取消</button>
-                <button id="ad-confirm" class="ad-button bg-blue-600 text-white hover:bg-blue-700">好的</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 创建分类模态框 -->
-    <div id="create-category-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="modal bg-white p-8 rounded-md shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4 text-center text-blue-600">创建分类</h2>
-            <input type="text" id="category-name" placeholder="分类名称" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <button id="create-category-submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-full rounded-md">创建</button>
-        </div>
-    </div>
-
-    <!-- 创建文件夹模态框 -->
-    <div id="create-folder-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="modal bg-white p-8 rounded-md shadow-lg w-96">
-            <h2 class="text-2xl font-bold mb-4 text-center text-blue-600">创建文件夹</h2>
-            <input type="text" id="folder-name" placeholder="文件夹名称" class="border border-gray-300 p-2 mb-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-            <div class="mb-2">
-                <label for="folder-category">选择分类：</label>
-                <select id="folder-category" class="border border-gray-300 p-1 rounded-md">
-                    <option value="">无分类</option>
-                    <!-- 分类将通过JavaScript动态添加 -->
-                </select>
-            </div>
-            <div class="mb-4">
-                <label>
-                    <input type="checkbox" id="folder-share-option" class="mr-1"> 允许分享此文件夹
-                </label>
-            </div>
-            <button id="create-folder-submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-full rounded-md">创建</button>
-        </div>
-    </div>
-
-    <!-- 管理用户模态框 -->
-    <div id="manage-users-modal" class="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 hidden justify-center items-center">
-        <div class="modal bg-white p-8 rounded-md shadow-lg w-3/4 max-w-2xl max-h-[80vh] overflow-y-auto">
-            <h2 class="text-2xl font-bold mb-4 text-center text-blue-600">管理用户</h2>
-            <div id="users-list" class="space-y-4">
-                <!-- 用户列表将通过JavaScript动态添加 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- 游客可见区域 -->
-    <div id="guest-area">
-        <div class="hall-section">
-            <h2 class="text-2xl font-bold mb-4 text-blue-600">公共文件大厅</h2>
-            <div id="public-file-list" class="bg-white p-4 rounded-md shadow-md">
-                <!-- 公共文件将通过JavaScript动态添加 -->
-            </div>
-        </div>
-    </div>
-
-    <!-- 主内容区域 -->
-    <div id="main-content" class="hidden p-4">
-        <!-- 用户信息 -->
-        <div class="flex items-center mb-4 bg-white p-4 rounded-md shadow-md">
-            <img id="user-avatar" src="https://picsum.photos/50/50" alt="用户头像" class="w-10 h-10 rounded-full mr-2">
-            <span id="username-display" class="text-lg font-bold text-blue-600">用户名</span>
-            <button id="upload-avatar-btn" class="ml-4 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md">上传头像</button>
-            <input type="file" id="avatar-input" class="hidden">
-        </div>
-
-        <!-- 搜索系统 -->
-        <div class="mb-4">
-            <div class="flex space-x-2">
-                <input type="text" id="search-input" placeholder="搜索我的文件或分类..." class="border border-gray-300 p-2 w-2/3 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <select id="search-category-filter" class="border border-gray-300 p-2 w-1/3 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">所有分类</option>
-                    <!-- 分类将通过JavaScript动态添加 -->
-                </select>
-            </div>
-        </div>
-        
-        <!-- 公共搜索 -->
-        <div class="mb-4">
-            <div class="flex space-x-2">
-                <input type="text" id="public-search-input" placeholder="公共搜索文件或分类..." class="border border-gray-300 p-2 w-2/3 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <select id="public-search-category-filter" class="border border-gray-300 p-2 w-1/3 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">所有分类</option>
-                    <!-- 公共分类将通过JavaScript动态添加 -->
-                </select>
-            </div>
-        </div>
-
-        <!-- 文件夹和分类操作 -->
-        <div class="mb-4">
-            <button id="create-folder-btn" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md mr-2">
-                <i class="fas fa-folder-plus"></i> 创建文件夹
-            </button>
-            <button id="create-category-btn" class="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-md mr-2">
-                <i class="fas fa-tags"></i> 创建分类
-            </button>
-            <button id="back-to-root-btn" class="bg-gray-600 hover:bg-gray-700 text-white p-2 rounded-md">
-                <i class="fas fa-home"></i> 返回根目录
-            </button>
-        </div>
-
-        <!-- 路径导航 -->
-        <div class="path-nav" id="path-nav">
-            <span class="path-item" data-path="">我的文件</span>
-        </div>
-
-        <!-- 上传区域 -->
-        <div class="upload-area" id="upload-area">
-            <i class="fas fa-cloud-upload-alt text-5xl text-blue-600 mb-3"></i>
-            <h3 class="text-xl font-semibold mb-2">点击或拖拽文件到此处上传</h3>
-            <p class="text-gray-600 mb-3">支持图片、文档、APK、ZIP等多种格式</p>
-            <div class="file-options mb-3">
-                <div class="mb-2">
-                    <label for="file-category">选择分类：</label>
-                    <select id="file-category" class="border border-gray-300 p-1 rounded-md">
-                        <option value="">无分类</option>
-                        <!-- 分类将通过JavaScript动态添加 -->
-                    </select>
-                </div>
-                <div class="file-expiry-options mb-2">
-                    <label for="file-expiry">文件有效期：</label>
-                    <select id="file-expiry" class="border border-gray-300 p-1 rounded-md">
-                        <option value="7">7天</option>
-                        <option value="30">30天</option>
-                        <option value="90">90天</option>
-                        <option value="permanent" selected>永久</option>
-                    </select>
-                </div>
-                <div class="file-share-option">
-                    <label>
-                        <input type="checkbox" id="file-share-option" class="mr-1"> 允许分享此文件
-                    </label>
-                </div>
-            </div>
-            <input type="file" id="file-upload" class="hidden">
-            <button id="upload-file-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md">选择文件上传</button>
-        </div>
-        
-        <div id="upload-progress" class="progress-bar hidden mt-2">
-            <div class="progress"></div>
-        </div>
-
-        <!-- 我的文件列表 -->
-        <div class="mt-6">
-            <h2 class="text-xl font-bold mb-2 text-blue-600" id="current-folder-title">我的文件</h2>
-            <div id="my-file-list" class="bg-white p-4 rounded-md shadow-md">
-                <!-- 我的文件项将通过 JavaScript 动态添加 -->
-            </div>
-        </div>
-
-        <!-- 我的分类 -->
-        <div class="mt-8 bg-white p-4 rounded-md shadow-md">
-            <h2 class="text-xl font-bold mb-4 text-blue-600">我的分类</h2>
-            <div id="my-categories" class="flex flex-wrap gap-2">
-                <!-- 分类将通过JavaScript动态添加 -->
-            </div>
-        </div>
-
-        <!-- 容量显示 -->
-        <p id="capacity-display" class="mt-4 text-gray-600">已使用 0GB，总容量 1TB</p>
-
-        <!-- 好友系统 -->
-        <div class="mt-8 bg-white p-4 rounded-md shadow-md">
-            <h2 class="text-xl font-bold mb-4 text-blue-600">好友管理</h2>
-            <div class="flex mb-4">
-                <input type="text" id="friend-username" placeholder="输入好友用户名" class="border border-gray-300 p-2 w-3/4 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <button id="add-friend-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-1/4 rounded-md ml-2">添加</button>
-            </div>
-            <div class="friends-list" id="friends-list">
-                <!-- 好友列表将通过JavaScript动态添加 -->
-            </div>
-        </div>
-
-        <!-- 登录记录 -->
-        <div class="mt-8 bg-white p-4 rounded-md shadow-md">
-            <h2 class="text-xl font-bold mb-4 text-blue-600">登录记录</h2>
-            <div id="login-history" class="space-y-2">
-                <!-- 登录记录将通过JavaScript动态添加 -->
-            </div>
-        </div>
-
-        <!-- 公共文件大厅 -->
-        <div class="hall-section">
-            <h2 class="text-2xl font-bold mb-4 text-blue-600">最近上传的公共文件</h2>
-            <div id="recent-public-files" class="bg-white p-4 rounded-md shadow-md">
-                <!-- 最近公共文件将通过JavaScript动态添加 -->
-            </div>
-        </div>
-
-        <!-- 公共大厅交流 -->
-        <div id="public-chat-section" class="mt-8 bg-white p-4 rounded-md shadow-md">
-            <h2 class="text-2xl font-bold mb-4 text-blue-600">公共大厅交流</h2>
-            <div id="public-chat-messages" class="border border-gray-300 p-2 h-64 overflow-y-auto mb-2 rounded-md">
-                <!-- 公共聊天消息将通过JavaScript动态添加 -->
-            </div>
-            <div class="flex space-x-4">
-                <input type="text" id="public-chat-input" placeholder="输入消息" class="border border-gray-300 p-2 w-3/4 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <button id="send-public-chat-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-1/4 rounded-md">发送</button>
-            </div>
-        </div>
-
-        <!-- 私聊功能 -->
-        <div id="private-chat-section" class="mt-8 bg-white p-4 rounded-md shadow-md">
-            <h2 class="text-2xl font-bold mb-4 text-blue-600">私聊</h2>
-            <div class="mb-4">
-                <select id="chat-friend-select" class="border border-gray-300 p-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">选择聊天对象</option>
-                    <!-- 好友将通过JavaScript动态添加 -->
-                </select>
-            </div>
-            <div id="private-chat-messages" class="border border-gray-300 p-2 h-64 overflow-y-auto mb-2 rounded-md">
-                <!-- 私聊消息将通过JavaScript动态添加 -->
-            </div>
-            <div class="flex space-x-4">
-                <input type="text" id="private-chat-input" placeholder="输入消息" class="border border-gray-300 p-2 w-3/4 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                <button id="send-private-chat-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 w-1/4 rounded-md">发送</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 模拟数据存储 - 实际应用中会使用数据库和WebSocket
-        let users = JSON.parse(localStorage.getItem('cloudUsers')) || {};
-        let publicFiles = JSON.parse(localStorage.getItem('publicFiles')) || [];
-        let publicChatMessages = JSON.parse(localStorage.getItem('publicChatMessages')) || [];
-        let categories = JSON.parse(localStorage.getItem('categories')) || []; // 全局分类
-        let currentUser = localStorage.getItem('currentUser') || null;
-        let currentFolderPath = ''; // 当前文件夹路径
-        let lastChatTimestamp = null; // 用于检测新消息
-        let lastFileTimestamp = null; // 用于检测新文件
-        
-        // 系统配置
-        const totalCapacity = 1024; // 1TB
-        const maxFileSize = 100 * 1024 * 1024; // 50GB 文件大小限制
-        const allowedFileTypes = [
-            'image/jpeg', 'image/png', 'application/pdf', 'text/plain',
-            'application/vnd.android.package-archive', // APK
-            'application/zip', 'application/x-zip-compressed', // ZIP
-            'application/x-rar-compressed', 'application/x-7z-compressed'
-        ];
-        
-        // 初始化管理员账号 (admin/admin)
-        if (!users['admin']) {
-            users['admin'] = {
-                password: 'admin',
-                avatar: 'https://picsum.photos/50/50?random=admin',
-                files: [],
-                folders: [],
-                usedCapacity: 0,
-                friends: [],
-                loginHistory: [],
-                privateChats: {},
-                isAdmin: true // 管理员标识
-            };
-            saveUsersData();
-        }
-
-        // DOM元素
-        const loginModal = document.getElementById('login-modal');
-        const registerModal = document.getElementById('register-modal');
-        const mainContent = document.getElementById('main-content');
-        const guestArea = document.getElementById('guest-area');
-        const navActions = document.getElementById('nav-actions');
-        const userNav = document.getElementById('user-nav');
-        const adModal = document.getElementById('ad-modal');
-        const themeToggle = document.getElementById('theme-toggle');
-        const userThemeToggle = document.getElementById('user-theme-toggle');
-        const createFolderModal = document.getElementById('create-folder-modal');
-        const createCategoryModal = document.getElementById('create-category-modal');
-        const adminMenu = document.getElementById('admin-menu');
-        const manageUsersModal = document.getElementById('manage-users-modal');
-
-        // 初始化
-        init();
-
-        function init() {
-            // 检查主题设置
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                updateThemeIcon(true);
-            }
-            
-            // 检查登录状态 - 保持登录状态
-            if (currentUser && users[currentUser]) {
-                // 确保用户数据结构完整
-                if (!users[currentUser].folders) users[currentUser].folders = [];
-                if (!users[currentUser].categories) users[currentUser].categories = [];
-                showUserArea();
-            } else {
-                showGuestArea();
-            }
-            
-            // 初始化广告弹窗，3秒后自动消失
-            setTimeout(() => {
-                if (adModal.style.display !== 'none') {
-                    closeAdModal();
-                }
-            }, 3000);
-            
-            // 渲染公共文件列表
-            renderPublicFiles();
-            
-            // 绑定事件
-            bindEvents();
-            
-            // 设置实时更新检查
-            setInterval(checkForUpdates, 3000); // 每3秒检查一次更新
-        }
-
-        // 检查实时更新
-        function checkForUpdates() {
-            // 从本地存储重新加载数据，模拟服务器数据同步
-            const latestUsers = JSON.parse(localStorage.getItem('cloudUsers')) || {};
-            const latestPublicFiles = JSON.parse(localStorage.getItem('publicFiles')) || [];
-            const latestPublicChats = JSON.parse(localStorage.getItem('publicChatMessages')) || [];
-            const latestCategories = JSON.parse(localStorage.getItem('categories')) || [];
-            
-            // 检查是否有新消息
-            if (latestPublicChats.length > 0) {
-                const latestChatTime = new Date(latestPublicChats[0].time).getTime();
-                if (!lastChatTimestamp || latestChatTime > lastChatTimestamp) {
-                    lastChatTimestamp = latestChatTime;
-                    publicChatMessages = latestPublicChats;
-                    
-                    // 如果用户已登录且在聊天区域，更新聊天
-                    if (currentUser && !mainContent.classList.contains('hidden')) {
-                        renderPublicChat();
-                        
-                        // 显示新消息通知
-                        const notificationIndicator = document.getElementById('notification-indicator');
-                        notificationIndicator.classList.remove('hidden');
-                        
-                        // 播放提示音
-                        playNotificationSound();
-                    }
-                }
-            }
-            
-            // 检查是否有新文件
-            if (latestPublicFiles.length > 0) {
-                const latestFileTime = new Date(latestPublicFiles[0].uploadTime || latestPublicFiles[0].createTime).getTime();
-                if (!lastFileTimestamp || latestFileTime > lastFileTimestamp) {
-                    lastFileTimestamp = latestFileTime;
-                    publicFiles = latestPublicFiles;
-                    
-                    // 更新文件列表
-                    if (currentUser && !mainContent.classList.contains('hidden')) {
-                        renderPublicFiles();
-                    } else {
-                        renderPublicFiles();
-                    }
-                }
-            }
-            
-            // 更新用户数据
-            users = latestUsers;
-            categories = latestCategories;
-            
-            // 如果用户已登录，更新用户信息
-            if (currentUser && users[currentUser] && !mainContent.classList.contains('hidden')) {
-                document.getElementById('user-avatar').src = users[currentUser].avatar;
-                renderFriends();
-                updateCapacityDisplay();
-            }
-        }
-
-        // 播放通知声音
-        function playNotificationSound() {
-            try {
-                // 创建一个简单的提示音
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) {
-                console.log('提示音播放失败:', e);
-            }
-        }
-
-        function bindEvents() {
-            // 广告弹窗按钮
-            document.getElementById('ad-cancel').addEventListener('click', closeAdModal);
-            document.getElementById('ad-confirm').addEventListener('click', closeAdModal);
-            
-            // 登录注册按钮
-            document.getElementById('login-btn').addEventListener('click', () => {
-                loginModal.classList.remove('hidden');
-                loginModal.querySelector('.modal').classList.add('active');
-            });
-            
-            document.getElementById('register-btn').addEventListener('click', () => {
-                registerModal.classList.remove('hidden');
-                registerModal.querySelector('.modal').classList.add('active');
-            });
-            
-            // 注册提交
-            document.getElementById('register-submit').addEventListener('click', register);
-            
-            // 登录提交
-            document.getElementById('login-submit').addEventListener('click', login);
-            
-            // 退出登录
-            document.getElementById('logout-btn').addEventListener('click', logout);
-            
-            // 主题切换
-            themeToggle.addEventListener('click', toggleTheme);
-            userThemeToggle.addEventListener('click', toggleTheme);
-            
-            // 通知按钮
-            document.getElementById('notifications-btn').addEventListener('click', () => {
-                document.getElementById('notification-indicator').classList.add('hidden');
-                // 滚动到最新消息
-                const chatMessages = document.getElementById('public-chat-messages');
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            });
-            
-            // 管理员功能
-            document.getElementById('manage-users-btn').addEventListener('click', () => {
-                manageUsersModal.classList.remove('hidden');
-                manageUsersModal.querySelector('.modal').classList.add('active');
-                renderUsersList();
-            });
-            
-            // 上传头像
-            document.getElementById('upload-avatar-btn').addEventListener('click', () => {
-                document.getElementById('avatar-input').click();
-            });
-            
-            document.getElementById('avatar-input').addEventListener('change', uploadAvatar);
-            
-            // 创建文件夹
-            document.getElementById('create-folder-btn').addEventListener('click', () => {
-                createFolderModal.classList.remove('hidden');
-                createFolderModal.querySelector('.modal').classList.add('active');
-                document.getElementById('folder-name').value = '';
-                populateCategorySelectors();
-            });
-            
-            document.getElementById('create-folder-submit').addEventListener('click', createFolder);
-            
-            // 创建分类
-            document.getElementById('create-category-btn').addEventListener('click', () => {
-                createCategoryModal.classList.remove('hidden');
-                createCategoryModal.querySelector('.modal').classList.add('active');
-                document.getElementById('category-name').value = '';
-            });
-            
-            document.getElementById('create-category-submit').addEventListener('click', createCategory);
-            
-            // 返回根目录
-            document.getElementById('back-to-root-btn').addEventListener('click', () => {
-                currentFolderPath = '';
-                renderMyFiles();
-                updatePathNavigation();
-                document.getElementById('current-folder-title').textContent = '我的文件';
-            });
-            
-            // 文件上传区域
-            const uploadArea = document.getElementById('upload-area');
-            uploadArea.addEventListener('click', () => {
-                document.getElementById('file-upload').click();
-            });
-            
-            // 拖拽上传
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.style.backgroundColor = '';
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '';
-                if (e.dataTransfer.files.length) {
-                    document.getElementById('file-upload').files = e.dataTransfer.files;
-                    uploadFiles();
-                }
-            });
-            
-            // 文件上传按钮
-            document.getElementById('upload-file-btn').addEventListener('click', uploadFiles);
-            document.getElementById('file-upload').addEventListener('change', uploadFiles);
-            
-            // 文件搜索
-            document.getElementById('search-input').addEventListener('input', searchMyFiles);
-            document.getElementById('search-category-filter').addEventListener('change', searchMyFiles);
-            document.getElementById('public-search-input').addEventListener('input', searchPublicFiles);
-            document.getElementById('public-search-category-filter').addEventListener('change', searchPublicFiles);
-            
-            // 添加好友
-            document.getElementById('add-friend-btn').addEventListener('click', addFriend);
-            
-            // 公共聊天
-            document.getElementById('send-public-chat-btn').addEventListener('click', sendPublicChat);
-            document.getElementById('public-chat-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendPublicChat();
-            });
-            
-            // 私聊
-            document.getElementById('send-private-chat-btn').addEventListener('click', sendPrivateChat);
-            document.getElementById('private-chat-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') sendPrivateChat();
-            });
-            
-            document.getElementById('chat-friend-select').addEventListener('change', loadPrivateChat);
-            
-            // 关闭模态框点击外部区域
-            const modals = [loginModal, registerModal, createFolderModal, createCategoryModal, manageUsersModal];
-            modals.forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        closeModals();
-                    }
-                });
-            });
-        }
-
-        // 关闭广告弹窗
-        function closeAdModal() {
-            adModal.style.display = 'none';
-        }
-
-        // 注册功能
-        function register() {
-            const username = document.getElementById('register-username').value.trim();
-            const password = document.getElementById('register-password').value;
-            
-            if (!username || !password) {
-                alert('请输入用户名和密码');
-                return;
-            }
-            
-            if (users[username]) {
-                alert('用户名已存在');
-                return;
-            }
-            
-            // 创建新用户
-            users[username] = {
-                password,
-                avatar: `https://picsum.photos/50/50?random=${username}`,
-                files: [],
-                folders: [],
-                categories: [], // 用户自定义分类
-                usedCapacity: 0,
-                friends: [],
-                loginHistory: [],
-                privateChats: {},
-                isAdmin: false // 默认为普通用户
-            };
-            
-            // 保存到本地存储
-            saveUsersData();
-            alert('注册成功，请登录');
-            
-            // 关闭模态框
-            closeModals();
-        }
-
-        // 登录功能
-        function login() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-            
-            if (!users[username] || users[username].password !== password) {
-                alert('用户名或密码错误');
-                return;
-            }
-            
-            // 记录登录信息
-            currentUser = username;
-            const now = new Date();
-            const loginTime = now.toLocaleString();
-            
-            // 确保数据结构完整
-            if (!users[currentUser].folders) users[currentUser].folders = [];
-            if (!users[currentUser].categories) users[currentUser].categories = [];
-            
-            // 添加登录记录
-            users[currentUser].loginHistory.unshift({
-                time: loginTime,
-                ip: '192.168.1.1' // 模拟IP
-            });
-            
-            // 限制登录记录数量
-            if (users[currentUser].loginHistory.length > 10) {
-                users[currentUser].loginHistory.pop();
-            }
-            
-            // 保存数据
-            localStorage.setItem('currentUser', currentUser);
-            saveUsersData();
-            
-            // 重置当前文件夹路径
-            currentFolderPath = '';
-            
-            // 更新最后活动时间戳
-            lastChatTimestamp = publicChatMessages.length > 0 
-                ? new Date(publicChatMessages[0].time).getTime() 
-                : null;
-            lastFileTimestamp = publicFiles.length > 0
-                ? new Date(publicFiles[0].uploadTime || publicFiles[0].createTime).getTime()
-                : null;
-            
-            // 显示用户区域
-            showUserArea();
-            
-            // 关闭模态框
-            closeModals();
-        }
-
-        // 退出登录
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            showGuestArea();
-        }
-
-        // 显示用户区域
-        function showUserArea() {
-            navActions.classList.add('hidden');
-            userNav.classList.remove('hidden');
-            mainContent.classList.remove('hidden');
-            guestArea.classList.add('hidden');
-            
-            // 检查是否为管理员
-            if (users[currentUser] && users[currentUser].isAdmin) {
-                adminMenu.classList.remove('hidden');
-            } else {
-                adminMenu.classList.add('hidden');
-            }
-            
-            // 更新用户信息
-            document.getElementById('nav-username').textContent = currentUser;
-            document.getElementById('username-display').textContent = currentUser;
-            document.getElementById('user-avatar').src = users[currentUser].avatar;
-            
-            // 填充分类选择器
-            populateCategorySelectors();
-            
-            // 渲染我的文件
-            renderMyFiles();
-            
-            // 渲染我的分类
-            renderMyCategories();
-            
-            // 更新路径导航
-            updatePathNavigation();
-            
-            // 渲染登录记录
-            renderLoginHistory();
-            
-            // 渲染好友列表
-            renderFriends();
-            
-            // 渲染公共聊天
-            renderPublicChat();
-            
-            // 更新容量显示
-            updateCapacityDisplay();
-        }
-
-        // 显示游客区域
-        function showGuestArea() {
-            navActions.classList.remove('hidden');
-            userNav.classList.add('hidden');
-            mainContent.classList.add('hidden');
-            guestArea.classList.remove('hidden');
-            adminMenu.classList.add('hidden');
-        }
-
-        // 关闭模态框
-        function closeModals() {
-            loginModal.classList.add('hidden');
-            registerModal.classList.add('hidden');
-            createFolderModal.classList.add('hidden');
-            createCategoryModal.classList.add('hidden');
-            manageUsersModal.classList.add('hidden');
-            
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => modal.classList.remove('active'));
-            
-            // 清空输入框
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            document.getElementById('register-username').value = '';
-            document.getElementById('register-password').value = '';
-            document.getElementById('folder-name').value = '';
-            document.getElementById('category-name').value = '';
-        }
-
-        // 上传头像
-        function uploadAvatar(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    users[currentUser].avatar = event.target.result;
-                    document.getElementById('user-avatar').src = event.target.result;
-                    saveUsersData();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // 创建分类
-        function createCategory() {
-            const categoryName = document.getElementById('category-name').value.trim();
-            
-            if (!categoryName) {
-                alert('请输入分类名称');
-                return;
-            }
-            
-            // 检查分类是否已存在
-            const categoryExists = users[currentUser].categories.some(c => c.name.toLowerCase() === categoryName.toLowerCase());
-            if (categoryExists) {
-                alert('分类已存在');
-                return;
-            }
-            
-            // 创建分类对象
-            const newCategory = {
-                id: 'category_' + Date.now(),
-                name: categoryName,
-                createTime: new Date().toISOString(),
-                owner: currentUser
-            };
-            
-            // 添加到用户分类
-            users[currentUser].categories.push(newCategory);
-            
-            // 添加到全局分类列表（去重）
-            if (!categories.some(c => c.name.toLowerCase() === categoryName.toLowerCase())) {
-                categories.push({
-                    id: newCategory.id,
-                    name: categoryName
-                });
-                saveCategories();
-            }
-            
-            // 保存数据
-            saveUsersData();
-            
-            // 更新UI
-            renderMyCategories();
-            populateCategorySelectors();
-            
-            // 关闭模态框
-            closeModals();
-        }
-
-        // 渲染我的分类
-        function renderMyCategories() {
-            const categoriesContainer = document.getElementById('my-categories');
-            categoriesContainer.innerHTML = '';
-            
-            if (!users[currentUser].categories || users[currentUser].categories.length === 0) {
-                categoriesContainer.innerHTML = '<p class="text-gray-500">暂无分类，点击"创建分类"添加</p>';
-                return;
-            }
-            
-            users[currentUser].categories.forEach(category => {
-                const categoryTag = document.createElement('div');
-                categoryTag.className = 'category-tag flex items-center';
-                categoryTag.innerHTML = `
-                    <span>${category.name}</span>
-                    <button class="delete-category ml-1 text-gray-500 hover:text-gray-700" data-id="${category.id}">
-                        <i class="fas fa-times-circle"></i>
-                    </button>
-                `;
-                categoriesContainer.appendChild(categoryTag);
-                
-                // 添加删除事件
-                categoryTag.querySelector('.delete-category').addEventListener('click', (e) => {
-                    const categoryId = e.currentTarget.getAttribute('data-id');
-                    deleteCategory(categoryId);
-                });
-            });
-        }
-
-        // 删除分类
-        function deleteCategory(categoryId) {
-            if (confirm('确定要删除此分类吗？使用此分类的文件将变为无分类状态。')) {
-                // 从用户分类中删除
-                users[currentUser].categories = users[currentUser].categories.filter(c => c.id !== categoryId);
-                
-                // 更新使用此分类的文件
-                users[currentUser].files.forEach(file => {
-                    if (file.categoryId === categoryId) {
-                        file.categoryId = '';
-                        file.categoryName = '';
-                    }
-                });
-                
-                // 更新使用此分类的文件夹
-                users[currentUser].folders.forEach(folder => {
-                    if (folder.categoryId === categoryId) {
-                        folder.categoryId = '';
-                        folder.categoryName = '';
-                    }
-                });
-                
-                // 保存数据
-                saveUsersData();
-                
-                // 更新UI
-                renderMyCategories();
-                renderMyFiles();
-                populateCategorySelectors();
-            }
-        }
-
-        // 填充分类选择器
-        function populateCategorySelectors() {
-            const fileCategory = document.getElementById('file-category');
-            const folderCategory = document.getElementById('folder-category');
-            const searchCategoryFilter = document.getElementById('search-category-filter');
-            const publicSearchCategoryFilter = document.getElementById('public-search-category-filter');
-            
-            // 保存当前选中值
-            const fileCategoryValue = fileCategory.value;
-            const folderCategoryValue = folderCategory.value;
-            const searchCategoryValue = searchCategoryFilter.value;
-            
-            // 清空选择器
-            fileCategory.innerHTML = '<option value="">无分类</option>';
-            folderCategory.innerHTML = '<option value="">无分类</option>';
-            searchCategoryFilter.innerHTML = '<option value="">所有分类</option>';
-            publicSearchCategoryFilter.innerHTML = '<option value="">所有分类</option>';
-            
-            // 添加用户分类
-            if (users[currentUser] && users[currentUser].categories) {
-                users[currentUser].categories.forEach(category => {
-                    const fileOption = document.createElement('option');
-                    fileOption.value = category.id;
-                    fileOption.textContent = category.name;
-                    fileCategory.appendChild(fileOption);
-                    
-                    const folderOption = document.createElement('option');
-                    folderOption.value = category.id;
-                    folderOption.textContent = category.name;
-                    folderCategory.appendChild(folderOption);
-                    
-                    const searchOption = document.createElement('option');
-                    searchOption.value = category.id;
-                    searchOption.textContent = category.name;
-                    searchCategoryFilter.appendChild(searchOption);
-                });
-            }
-            
-            // 添加公共分类到公共搜索
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.name;
-                publicSearchCategoryFilter.appendChild(option);
-            });
-            
-            // 恢复选中值
-            if (fileCategoryValue) fileCategory.value = fileCategoryValue;
-            if (folderCategoryValue) folderCategory.value = folderCategoryValue;
-            if (searchCategoryValue) searchCategoryFilter.value = searchCategoryValue;
-        }
-
-        // 创建文件夹
-        function createFolder() {
-            const folderName = document.getElementById('folder-name').value.trim();
-            const categoryId = document.getElementById('folder-category').value;
-            const isShared = document.getElementById('folder-share-option').checked;
-            
-            if (!folderName) {
-                alert('请输入文件夹名称');
-                return;
-            }
-            
-            // 构建完整路径
-            const folderPath = currentFolderPath 
-                ? `${currentFolderPath}/${folderName}` 
-                : folderName;
-            
-            // 检查文件夹是否已存在
-            const folderExists = users[currentUser].folders.some(f => f.path === folderPath);
-            if (folderExists) {
-                alert('文件夹已存在');
-                return;
-            }
-            
-            // 获取分类名称
-            let categoryName = '';
-            if (categoryId) {
-                const category = users[currentUser].categories.find(c => c.id === categoryId);
-                if (category) categoryName = category.name;
-            }
-            
-            // 创建文件夹对象
-            const newFolder = {
-                id: 'folder_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                name: folderName,
-                path: folderPath,
-                createTime: new Date().toISOString(),
-                isShared: isShared,
-                owner: currentUser,
-                categoryId: categoryId,
-                categoryName: categoryName
-            };
-            
-            // 添加到用户文件夹
-            users[currentUser].folders.push(newFolder);
-            
-            // 如果是共享文件夹，添加到公共文件列表
-            if (isShared) {
-                publicFiles.unshift({
-                    ...newFolder,
-                    type: 'folder'
-                });
-                savePublicFiles();
-            }
-            
-            // 保存数据
-            saveUsersData();
-            
-            // 更新UI
-            renderMyFiles();
-            renderPublicFiles();
-            
-            // 关闭模态框
-            closeModals();
-        }
-
-        // 上传文件
-        function uploadFiles() {
-            const fileInput = document.getElementById('file-upload');
-            const files = fileInput.files;
-            const expiry = document.getElementById('file-expiry').value;
-            const isShared = document.getElementById('file-share-option').checked;
-            const categoryId = document.getElementById('file-category').value;
-            
-            if (files.length === 0) return;
-            
-            // 获取分类名称
-            let categoryName = '';
-            if (categoryId) {
-                const category = users[currentUser].categories.find(c => c.id === categoryId);
-                if (category) categoryName = category.name;
-            }
-            
-            // 处理每个文件
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                handleFileUpload(file, expiry, isShared, categoryId, categoryName);
-            }
-            
-            // 清空文件输入
-            fileInput.value = '';
-        }
-
-        // 处理文件上传
-        function handleFileUpload(file, expiry, isShared, categoryId, categoryName) {
-            // 验证文件大小
-            if (file.size > maxFileSize) {
-                alert(`文件 ${file.name} 大小超过限制（最大 50GB）`);
-                return;
-            }
-            
-            // 验证文件类型
-            if (!allowedFileTypes.includes(file.type) && 
-                !allowedFileTypes.some(type => file.name.toLowerCase().endsWith(type.split('/')[1]))) {
-                alert(`文件 ${file.name} 类型不支持`);
-                return;
-            }
-            
-            // 计算文件大小(GB)
-            const fileSizeGB = file.size / (1024 * 1024 * 1024);
-            
-            // 检查容量
-            if (users[currentUser].usedCapacity + fileSizeGB > totalCapacity) {
-                alert('存储空间不足');
-                return;
-            }
-            
-            // 显示进度条
-            const uploadProgress = document.getElementById('upload-progress');
-            const progressBar = uploadProgress.querySelector('.progress');
-            uploadProgress.classList.remove('hidden');
-            progressBar.style.width = '0%';
-            progressBar.textContent = '0%';
-            
-            // 读取文件内容，用于生成可下载的直链
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const fileContent = e.target.result;
-                
-                // 模拟上传进度
-                let progress = 0;
-                const interval = setInterval(() => {
-                    if (progress >= 100) {
-                        clearInterval(interval);
-                        
-                        // 创建文件ID
-                        const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                        
-                        // 计算过期时间
-                        let expiryDate = null;
-                        if (expiry !== 'permanent') {
-                            const date = new Date();
-                            date.setDate(date.getDate() + parseInt(expiry));
-                            expiryDate = date.toISOString();
-                        }
-                        
-                        // 构建文件路径
-                        const filePath = currentFolderPath 
-                            ? `${currentFolderPath}/${file.name}` 
-                            : file.name;
-                        
-                        // 创建文件对象
-                        const newFile = {
-                            id: fileId,
-                            name: file.name,
-                            path: filePath,
-                            size: file.size,
-                            type: file.type,
-                            content: fileContent,
-                            uploadTime: new Date().toISOString(),
-                            owner: currentUser,
-                            expiry: expiryDate,
-                            isShared: isShared,
-                            directLink: `direct_link_${fileId}`,
-                            categoryId: categoryId,
-                            categoryName: categoryName
-                        };
-                        
-                        // 添加到用户文件
-                        users[currentUser].files.push(newFile);
-                        users[currentUser].usedCapacity += fileSizeGB;
-                        
-                        // 如果是共享文件，添加到公共文件列表
-                        if (isShared) {
-                            publicFiles.unshift(newFile);
-                            savePublicFiles();
-                        }
-                        
-                        // 保存数据
-                        saveUsersData();
-                        
-                        // 更新UI
-                        renderMyFiles();
-                        renderPublicFiles();
-                        updateCapacityDisplay();
-                        
-                        // 隐藏进度条
-                        uploadProgress.classList.add('hidden');
-                        
-                        alert('文件上传成功');
-                    } else {
-                        progress += 10;
-                        progressBar.style.width = `${progress}%`;
-                        progressBar.textContent = `${progress}%`;
-                    }
-                }, 300);
-            };
-            
-            // 读取文件内容
-            reader.readAsDataURL(file);
-        }
-
-        // 渲染我的文件和文件夹
-        function renderMyFiles(searchQuery = '', categoryFilter = '') {
-            const fileList = document.getElementById('my-file-list');
-            fileList.innerHTML = '';
-            
-            // 获取当前路径下的文件夹
-            const currentFolders = currentFolderPath
-                ? users[currentUser].folders.filter(f => {
-                    // 检查文件夹的父路径是否与当前路径匹配
-                    const lastSlashIndex = f.path.lastIndexOf('/');
-                    const parentPath = lastSlashIndex > -1 ? f.path.substring(0, lastSlashIndex) : '';
-                    return parentPath === currentFolderPath;
-                  })
-                : users[currentUser].folders.filter(f => !f.path.includes('/'));
-            
-            // 获取当前路径下的文件
-            const currentFiles = currentFolderPath
-                ? users[currentUser].files.filter(f => {
-                    const lastSlashIndex = f.path.lastIndexOf('/');
-                    const parentPath = lastSlashIndex > -1 ? f.path.substring(0, lastSlashIndex) : '';
-                    return parentPath === currentFolderPath;
-                  })
-                : users[currentUser].files.filter(f => !f.path.includes('/'));
-            
-            // 应用搜索和分类过滤
-            let filteredFolders = currentFolders;
-            let filteredFiles = currentFiles;
-            
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                filteredFolders = filteredFolders.filter(f => 
-                    f.name.toLowerCase().includes(query) || 
-                    (f.categoryName && f.categoryName.toLowerCase().includes(query))
-                );
-                
-                filteredFiles = filteredFiles.filter(f => 
-                    f.name.toLowerCase().includes(query) || 
-                    (f.categoryName && f.categoryName.toLowerCase().includes(query))
-                );
-            }
-            
-            if (categoryFilter) {
-                filteredFolders = filteredFolders.filter(f => f.categoryId === categoryFilter);
-                filteredFiles = filteredFiles.filter(f => f.categoryId === categoryFilter);
-            }
-            
-            if (filteredFolders.length === 0 && filteredFiles.length === 0) {
-                fileList.innerHTML = '<p class="text-gray-500">此文件夹为空</p>';
-                return;
-            }
-            
-            // 先渲染文件夹
-            filteredFolders.forEach(folder => {
-                const folderItem = document.createElement('div');
-                folderItem.className = 'folder-item border border-gray-300 p-2 mb-2 rounded-md';
-                
-                // 高亮搜索结果
-                let folderName = folder.name;
-                if (searchQuery) {
-                    const query = searchQuery.toLowerCase();
-                    const index = folder.name.toLowerCase().indexOf(query);
-                    if (index !== -1) {
-                        folderName = folder.name.substring(0, index) + 
-                                   '<span class="search-highlight">' + 
-                                   folder.name.substring(index, index + query.length) + 
-                                   '</span>' + 
-                                   folder.name.substring(index + query.length);
-                    }
-                }
-                
-                folderItem.innerHTML = `
-                    <div>
-                        <i class="fas fa-folder text-yellow-500 mr-2"></i>
-                        <span>${folderName}</span>
-                        ${folder.categoryName ? `<span class="category-tag">${folder.categoryName}</span>` : ''}
-                        <span class="text-xs text-gray-500 block mt-1">
-                            创建于: ${new Date(folder.createTime).toLocaleString()} 
-                            ${folder.isShared ? '<i class="fas fa-share-alt text-green-500 ml-1"></i>' : ''}
-                        </span>
-                    </div>
-                    <div class="flex space-x-2">
-                        ${folder.isShared ? `
-                            <button class="share-folder-btn text-green-600 hover:text-green-800" data-id="${folder.id}">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        ` : ''}
-                        <button class="enter-folder-btn text-blue-600 hover:text-blue-800" data-path="${folder.path}">
-                            <i class="fas fa-folder-open"></i>
-                        </button>
-                        ${users[currentUser].isAdmin ? `
-                            <button class="delete-folder-btn admin-action-btn" data-id="${folder.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                fileList.appendChild(folderItem);
-            });
-            
-            // 再渲染文件
-            filteredFiles.forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item border border-gray-300 p-2 mb-2 rounded-md';
-                
-                // 确定文件图标
-                let fileIcon = 'fas fa-file';
-                if (file.type.startsWith('image/')) fileIcon = 'fas fa-file-image';
-                else if (file.type === 'application/pdf') fileIcon = 'fas fa-file-pdf';
-                else if (file.type === 'text/plain') fileIcon = 'fas fa-file-alt';
-                else if (file.type === 'application/vnd.android.package-archive') fileIcon = 'fas fa-mobile-alt';
-                else if (file.type.includes('zip') || file.type.includes('rar') || file.type.includes('7z')) fileIcon = 'fas fa-file-archive';
-                
-                // 计算文件大小
-                let fileSizeText = '';
-                if (file.size < 1024) fileSizeText = `${file.size} B`;
-                else if (file.size < 1024 * 1024) fileSizeText = `${(file.size / 1024).toFixed(2)} KB`;
-                else if (file.size < 1024 * 1024 * 1024) fileSizeText = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
-                else fileSizeText = `${(file.size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-                
-                // 过期时间显示
-                let expiryText = '永久有效';
-                if (file.expiry) {
-                    const expiryDate = new Date(file.expiry);
-                    expiryText = `有效期至: ${expiryDate.toLocaleString()}`;
-                }
-                
-                // 高亮搜索结果
-                let fileName = file.name;
-                if (searchQuery) {
-                    const query = searchQuery.toLowerCase();
-                    const index = file.name.toLowerCase().indexOf(query);
-                    if (index !== -1) {
-                        fileName = file.name.substring(0, index) + 
-                                   '<span class="search-highlight">' + 
-                                   file.name.substring(index, index + query.length) + 
-                                   '</span>' + 
-                                   file.name.substring(index + query.length);
-                    }
-                }
-                
-                fileItem.innerHTML = `
-                    <div>
-                        <i class="${fileIcon} mr-2 text-blue-600"></i>
-                        <span>${fileName}</span>
-                        ${file.categoryName ? `<span class="category-tag">${file.categoryName}</span>` : ''}
-                        <span class="text-sm text-gray-500 ml-2">${fileSizeText}</span>
-                        <span class="text-xs text-gray-500 block mt-1">
-                            ${expiryText} 
-                            ${file.isShared ? '<i class="fas fa-share-alt text-green-500 ml-1"></i>' : ''}
-                        </span>
-                    </div>
-                    <div class="flex space-x-2">
-                        ${file.isShared ? `
-                            <button class="share-file-btn text-green-600 hover:text-green-800" data-id="${file.id}">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        ` : ''}
-                        <button class="download-file-btn text-blue-600 hover:text-blue-800" data-id="${file.id}">
-                            <i class="fas fa-download"></i>
-                        </button>
-                        ${users[currentUser].isAdmin ? `
-                            <button class="delete-file-btn admin-action-btn" data-id="${file.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                fileList.appendChild(fileItem);
-            });
-            
-            // 添加文件夹事件
-            document.querySelectorAll('.enter-folder-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const folderPath = e.currentTarget.getAttribute('data-path');
-                    currentFolderPath = folderPath;
-                    
-                    // 更新当前文件夹标题
-                    const folderName = folderPath.split('/').pop();
-                    document.getElementById('current-folder-title').textContent = folderName;
-                    
-                    // 重新渲染文件列表
-                    renderMyFiles();
-                    
-                    // 更新路径导航
-                    updatePathNavigation();
-                });
-            });
-            
-            // 添加删除事件（管理员）
-            document.querySelectorAll('.delete-file-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (confirm('确定要删除此文件吗？')) {
-                        const fileId = e.currentTarget.getAttribute('data-id');
-                        deleteFile(fileId);
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.delete-folder-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (confirm('确定要删除此文件夹吗？文件夹内的所有文件也将被删除。')) {
-                        const folderId = e.currentTarget.getAttribute('data-id');
-                        deleteFolder(folderId);
-                    }
-                });
-            });
-            
-            // 添加分享和下载事件
-            document.querySelectorAll('.share-file-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const fileId = e.currentTarget.getAttribute('data-id');
-                    shareFile(fileId);
-                });
-            });
-            
-            document.querySelectorAll('.share-folder-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const folderId = e.currentTarget.getAttribute('data-id');
-                    shareFolder(folderId);
-                });
-            });
-            
-            document.querySelectorAll('.download-file-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const fileId = e.currentTarget.getAttribute('data-id');
-                    downloadFile(fileId);
-                });
-            });
-        }
-
-        // 更新路径导航
-        function updatePathNavigation() {
-            const pathNav = document.getElementById('path-nav');
-            pathNav.innerHTML = '';
-            
-            // 添加根目录
-            const rootItem = document.createElement('span');
-            rootItem.className = 'path-item';
-            rootItem.dataset.path = '';
-            rootItem.textContent = '我的文件';
-            rootItem.addEventListener('click', () => {
-                currentFolderPath = '';
-                renderMyFiles();
-                updatePathNavigation();
-                document.getElementById('current-folder-title').textContent = '我的文件';
-            });
-            pathNav.appendChild(rootItem);
-            
-            if (!currentFolderPath) return;
-            
-            // 分割路径
-            const pathParts = currentFolderPath.split('/');
-            let currentPath = '';
-            
-            // 添加路径部分
-            pathParts.forEach((part, index) => {
-                // 添加分隔符
-                const separator = document.createElement('span');
-                separator.className = 'path-separator';
-                separator.textContent = '/';
-                pathNav.appendChild(separator);
-                
-                // 添加路径项
-                currentPath = index === 0 ? part : `${currentPath}/${part}`;
-                const pathItem = document.createElement('span');
-                pathItem.className = 'path-item';
-                pathItem.dataset.path = currentPath;
-                pathItem.textContent = part;
-                pathItem.addEventListener('click', () => {
-                    currentFolderPath = currentPath;
-                    renderMyFiles();
-                    updatePathNavigation();
-                    document.getElementById('current-folder-title').textContent = part;
-                });
-                pathNav.appendChild(pathItem);
-            });
-        }
-
-        // 渲染公共文件
-        function renderPublicFiles(searchQuery = '', categoryFilter = '') {
-            // 渲染游客可见的公共文件
-            const publicFileList = document.getElementById('public-file-list');
-            publicFileList.innerHTML = '';
-            
-            // 渲染用户可见的最近公共文件
-            const recentPublicFiles = document.getElementById('recent-public-files');
-            if (recentPublicFiles) recentPublicFiles.innerHTML = '';
-            
-            // 过滤过期和未分享的文件
-            const now = new Date();
-            let validPublicItems = publicFiles.filter(item => {
-                // 检查是否共享
-                if (!item.isShared) return false;
-                
-                // 检查是否过期
-                if (item.type !== 'folder' && item.expiry) {
-                    return new Date(item.expiry) > now;
-                }
-                return true;
-            });
-            
-            // 应用搜索和分类过滤
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                validPublicItems = validPublicItems.filter(item => 
-                    item.name.toLowerCase().includes(query) || 
-                    (item.categoryName && item.categoryName.toLowerCase().includes(query))
-                );
-            }
-            
-            if (categoryFilter) {
-                validPublicItems = validPublicItems.filter(item => item.categoryId === categoryFilter);
-            }
-            
-            // 更新公共文件列表
-            publicFiles = validPublicItems;
-            savePublicFiles();
-            
-            if (validPublicItems.length === 0) {
-                publicFileList.innerHTML = '<p class="text-gray-500">暂无公共文件</p>';
-                if (recentPublicFiles) recentPublicFiles.innerHTML = '<p class="text-gray-500">暂无公共文件</p>';
-                return;
-            }
-            
-            // 渲染游客可见的公共文件
-            validPublicItems.slice(0, 10).forEach(item => {
-                const itemElement = createPublicItemElement(item, searchQuery);
-                publicFileList.appendChild(itemElement);
-            });
-            
-            // 渲染用户可见的最近公共文件
-            if (recentPublicFiles) {
-                validPublicItems.slice(0, 10).forEach(item => {
-                    const itemElement = createPublicItemElement(item, searchQuery);
-                    recentPublicFiles.appendChild(itemElement);
-                });
-            }
-        }
-
-        // 创建公共文件/文件夹项
-        function createPublicItemElement(item, searchQuery = '') {
-            const itemElement = document.createElement('div');
-            itemElement.className = item.type === 'folder' ? 'folder-item' : 'file-item';
-            itemElement.className += ' border border-gray-300 p-2 mb-2 rounded-md';
-            
-            // 高亮搜索结果
-            let itemName = item.name;
-            if (searchQuery) {
-                const query = searchQuery.toLowerCase();
-                const index = item.name.toLowerCase().indexOf(query);
-                if (index !== -1) {
-                    itemName = item.name.substring(0, index) + 
-                               '<span class="search-highlight">' + 
-                               item.name.substring(index, index + query.length) + 
-                               '</span>' + 
-                               item.name.substring(index + query.length);
-                }
-            }
-            
-            if (item.type === 'folder') {
-                // 文件夹
-                itemElement.innerHTML = `
-                    <div>
-                        <i class="fas fa-folder text-yellow-500 mr-2"></i>
-                        <span>${itemName}</span>
-                        ${item.categoryName ? `<span class="category-tag">${item.categoryName}</span>` : ''}
-                        <span class="text-xs text-gray-500 block mt-1">
-                            创建者: ${item.owner} · ${new Date(item.createTime).toLocaleString()}
-                        </span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="view-folder-btn text-blue-600 hover:text-blue-800" data-id="${item.id}">
-                            <i class="fas fa-folder-open"></i> 查看
-                        </button>
-                        ${currentUser && users[currentUser].isAdmin ? `
-                            <button class="delete-public-folder-btn admin-action-btn" data-id="${item.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // 添加查看事件
-                itemElement.querySelector('.view-folder-btn').addEventListener('click', (e) => {
-                    // 在实际应用中，这里应该显示文件夹内容
-                    alert(`查看共享文件夹: ${item.name}`);
-                });
-                
-                // 添加删除事件（管理员）
-                if (itemElement.querySelector('.delete-public-folder-btn')) {
-                    itemElement.querySelector('.delete-public-folder-btn').addEventListener('click', (e) => {
-                        if (confirm('确定要删除此公共文件夹吗？')) {
-                            const folderId = e.currentTarget.getAttribute('data-id');
-                            deletePublicFolder(folderId);
-                        }
-                    });
-                }
-            } else {
-                // 文件
-                // 确定文件图标
-                let fileIcon = 'fas fa-file';
-                if (item.type.startsWith('image/')) fileIcon = 'fas fa-file-image';
-                else if (item.type === 'application/pdf') fileIcon = 'fas fa-file-pdf';
-                else if (item.type === 'text/plain') fileIcon = 'fas fa-file-alt';
-                else if (item.type === 'application/vnd.android.package-archive') fileIcon = 'fas fa-mobile-alt';
-                else if (item.type.includes('zip') || item.type.includes('rar') || item.type.includes('7z')) fileIcon = 'fas fa-file-archive';
-                
-                // 计算文件大小
-                let fileSizeText = '';
-                if (item.size < 1024) fileSizeText = `${item.size} B`;
-                else if (item.size < 1024 * 1024) fileSizeText = `${(item.size / 1024).toFixed(2)} KB`;
-                else if (item.size < 1024 * 1024 * 1024) fileSizeText = `${(item.size / (1024 * 1024)).toFixed(2)} MB`;
-                else fileSizeText = `${(item.size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-                
-                // 格式化上传时间
-                const uploadDate = new Date(item.uploadTime);
-                const uploadTimeText = uploadDate.toLocaleString();
-                
-                itemElement.innerHTML = `
-                    <div>
-                        <i class="${fileIcon} mr-2 text-blue-600"></i>
-                        <span>${itemName}</span>
-                        ${item.categoryName ? `<span class="category-tag">${item.categoryName}</span>` : ''}
-                        <span class="text-sm text-gray-500 ml-2">${fileSizeText}</span>
-                        <span class="text-xs text-gray-500 block mt-1">
-                            上传者: ${item.owner} · ${uploadTimeText}
-                        </span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="download-public-file-btn text-blue-600 hover:text-blue-800" data-id="${item.id}">
-                            <i class="fas fa-download"></i> 下载
-                        </button>
-                        ${currentUser && users[currentUser].isAdmin ? `
-                            <button class="delete-public-file-btn admin-action-btn" data-id="${item.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // 添加下载事件
-                itemElement.querySelector('.download-public-file-btn').addEventListener('click', (e) => {
-                    const fileId = e.currentTarget.getAttribute('data-id');
-                    downloadFile(fileId);
-                });
-                
-                // 添加删除事件（管理员）
-                if (itemElement.querySelector('.delete-public-file-btn')) {
-                    itemElement.querySelector('.delete-public-file-btn').addEventListener('click', (e) => {
-                        if (confirm('确定要删除此公共文件吗？')) {
-                            const fileId = e.currentTarget.getAttribute('data-id');
-                            deletePublicFile(fileId);
-                        }
-                    });
-                }
-            }
-            
-            return itemElement;
-        }
-
-        // 分享文件（直链）
-        function shareFile(fileId) {
-            // 查找文件
-            const file = users[currentUser].files.find(f => f.id === fileId);
-            if (file) {
-                // 生成直链
-                const directLink = `${window.location.origin}/direct/${file.directLink}`;
-                
-                // 复制直链到剪贴板
-                navigator.clipboard.writeText(directLink).then(() => {
-                    alert('文件直链已复制到剪贴板');
-                }).catch(err => {
-                    console.error('无法复制链接: ', err);
-                    alert('文件直链: ' + directLink);
-                });
-            }
-        }
-
-        // 分享文件夹（直链）
-        function shareFolder(folderId) {
-            // 查找文件夹
-            const folder = users[currentUser].folders.find(f => f.id === folderId);
-            if (folder) {
-                // 生成直链
-                const directLink = `${window.location.origin}/direct/folder/${folder.id}`;
-                
-                // 复制直链到剪贴板
-                navigator.clipboard.writeText(directLink).then(() => {
-                    alert('文件夹直链已复制到剪贴板');
-                }).catch(err => {
-                    console.error('无法复制链接: ', err);
-                    alert('文件夹直链: ' + directLink);
-                });
-            }
-        }
-
-        // 下载文件（直接在浏览器中下载）
-        function downloadFile(fileId) {
-            // 查找文件
-            let file = null;
-            
-            // 先在当前用户文件中查找
-            if (currentUser) {
-                file = users[currentUser].files.find(f => f.id === fileId);
-            }
-            
-            // 再在公共文件中查找
-            if (!file) {
-                file = publicFiles.find(f => f.id === fileId && f.type !== 'folder');
-            }
-            
-            if (file && file.content) {
-                try {
-                    // 创建下载链接并触发下载
-                    const link = document.createElement('a');
-                    link.href = file.content;
-                    link.download = file.name;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } catch (error) {
-                    console.error('下载失败:', error);
-                    alert('文件下载失败');
-                }
-            } else {
-                alert('文件不存在或已过期');
-            }
-        }
-
-        // 删除文件（管理员功能）
-        function deleteFile(fileId) {
-            // 从用户文件中删除
-            const fileIndex = users[currentUser].files.findIndex(f => f.id === fileId);
-            if (fileIndex !== -1) {
-                const file = users[currentUser].files[fileIndex];
-                // 从容量中减去文件大小
-                const fileSizeGB = file.size / (1024 * 1024 * 1024);
-                users[currentUser].usedCapacity -= fileSizeGB;
-                
-                users[currentUser].files.splice(fileIndex, 1);
-                saveUsersData();
-                
-                // 从公共文件中删除
-                const publicFileIndex = publicFiles.findIndex(f => f.id === fileId);
-                if (publicFileIndex !== -1) {
-                    publicFiles.splice(publicFileIndex, 1);
-                    savePublicFiles();
-                }
-                
-                // 更新UI
-                renderMyFiles();
-                renderPublicFiles();
-                updateCapacityDisplay();
-            }
-        }
-
-        // 删除文件夹（管理员功能）
-        function deleteFolder(folderId) {
-            // 查找文件夹
-            const folder = users[currentUser].folders.find(f => f.id === folderId);
-            if (folder) {
-                // 删除该文件夹下的所有文件
-                const filesToRemove = users[currentUser].files.filter(f => 
-                    f.path.startsWith(folder.path + '/') || f.path === folder.path
-                );
-                
-                filesToRemove.forEach(file => {
-                    // 从容量中减去文件大小
-                    const fileSizeGB = file.size / (1024 * 1024 * 1024);
-                    users[currentUser].usedCapacity -= fileSizeGB;
-                    
-                    // 从公共文件中删除
-                    const publicFileIndex = publicFiles.findIndex(f => f.id === file.id);
-                    if (publicFileIndex !== -1) {
-                        publicFiles.splice(publicFileIndex, 1);
-                    }
-                });
-                
-                // 从用户文件中删除相关文件
-                users[currentUser].files = users[currentUser].files.filter(f => 
-                    !f.path.startsWith(folder.path + '/') && f.path !== folder.path
-                );
-                
-                // 从用户文件夹中删除
-                users[currentUser].folders = users[currentUser].folders.filter(f => f.id !== folderId);
-                
-                // 从公共文件中删除文件夹
-                publicFiles = publicFiles.filter(f => f.id !== folderId);
-                
-                // 保存数据
-                saveUsersData();
-                savePublicFiles();
-                
-                // 更新UI
-                renderMyFiles();
-                renderPublicFiles();
-                updateCapacityDisplay();
-            }
-        }
-
-        // 删除公共文件（管理员功能）
-        function deletePublicFile(fileId) {
-            // 从公共文件中删除
-            const publicFileIndex = publicFiles.findIndex(f => f.id === fileId);
-            if (publicFileIndex !== -1) {
-                const file = publicFiles[publicFileIndex];
-                publicFiles.splice(publicFileIndex, 1);
-                savePublicFiles();
-                
-                // 从文件所有者的文件列表中删除
-                if (users[file.owner]) {
-                    const ownerFileIndex = users[file.owner].files.findIndex(f => f.id === fileId);
-                    if (ownerFileIndex !== -1) {
-                        // 从容量中减去文件大小
-                        const fileSizeGB = file.size / (1024 * 1024 * 1024);
-                        users[file.owner].usedCapacity -= fileSizeGB;
-                        
-                        users[file.owner].files.splice(ownerFileIndex, 1);
-                        saveUsersData();
-                    }
-                }
-                
-                // 更新UI
-                renderPublicFiles();
-            }
-        }
-
-        // 删除公共文件夹（管理员功能）
-        function deletePublicFolder(folderId) {
-            // 从公共文件中删除
-            const publicFolderIndex = publicFiles.findIndex(f => f.id === folderId && f.type === 'folder');
-            if (publicFolderIndex !== -1) {
-                const folder = publicFiles[publicFolderIndex];
-                publicFiles.splice(publicFolderIndex, 1);
-                
-                // 删除该文件夹下的所有公共文件
-                const filesToRemove = publicFiles.filter(f => 
-                    f.owner === folder.owner && 
-                    (f.path.startsWith(folder.path + '/') || f.path === folder.path)
-                );
-                
-                filesToRemove.forEach(file => {
-                    const fileIndex = publicFiles.findIndex(f => f.id === file.id);
-                    if (fileIndex !== -1) {
-                        publicFiles.splice(fileIndex, 1);
-                    }
-                });
-                
-                savePublicFiles();
-                
-                // 从文件夹所有者的列表中删除
-                if (users[folder.owner]) {
-                    // 删除文件夹
-                    users[folder.owner].folders = users[folder.owner].folders.filter(f => f.id !== folderId);
-                    
-                    // 删除该文件夹下的所有文件
-                    const filesToRemoveFromOwner = users[folder.owner].files.filter(f => 
-                        f.path.startsWith(folder.path + '/') || f.path === folder.path
-                    );
-                    
-                    filesToRemoveFromOwner.forEach(file => {
-                        // 从容量中减去文件大小
-                        const fileSizeGB = file.size / (1024 * 1024 * 1024);
-                        users[folder.owner].usedCapacity -= fileSizeGB;
-                        
-                        const fileIndex = users[folder.owner].files.findIndex(f => f.id === file.id);
-                        if (fileIndex !== -1) {
-                            users[folder.owner].files.splice(fileIndex, 1);
-                        }
-                    });
-                    
-                    saveUsersData();
-                }
-                
-                // 更新UI
-                renderPublicFiles();
-            }
-        }
-
-        // 搜索我的文件
-        function searchMyFiles() {
-            const query = document.getElementById('search-input').value.trim();
-            const categoryFilter = document.getElementById('search-category-filter').value;
-            renderMyFiles(query, categoryFilter);
-        }
-
-        // 搜索公共文件
-        function searchPublicFiles() {
-            const query = document.getElementById('public-search-input').value.trim();
-            const categoryFilter = document.getElementById('public-search-category-filter').value;
-            renderPublicFiles(query, categoryFilter);
-        }
-
-        // 渲染用户列表（管理员功能）
-        function renderUsersList() {
-            const usersList = document.getElementById('users-list');
-            usersList.innerHTML = '';
-            
-            // 获取所有用户并排序
-            const userList = Object.keys(users).sort((a, b) => {
-                // 管理员排在前面
-                if (users[a].isAdmin && !users[b].isAdmin) return -1;
-                if (!users[a].isAdmin && users[b].isAdmin) return 1;
-                return a.localeCompare(b);
-            });
-            
-            userList.forEach(username => {
-                const user = users[username];
-                const userItem = document.createElement('div');
-                userItem.className = 'border border-gray-300 p-3 rounded-md';
-                
-                userItem.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center">
-                            <img src="${user.avatar}" alt="${username}的头像" class="w-10 h-10 rounded-full mr-3">
-                            <div>
-                                <strong>${username}</strong>
-                                ${user.isAdmin ? '<span class="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded">管理员</span>' : ''}
-                                <div class="text-sm text-gray-500">文件数: ${user.files ? user.files.length : 0}</div>
-                            </div>
-                        </div>
-                        <div>
-                            ${!user.isAdmin ? `
-                                <button class="delete-user-btn admin-action-btn mr-2" data-username="${username}">
-                                    <i class="fas fa-user-times"></i> 删除用户
-                                </button>
-                            ` : ''}
-                            <button class="view-user-files-btn text-blue-600 hover:text-blue-800" data-username="${username}">
-                                <i class="fas fa-folder-open"></i> 查看文件
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                usersList.appendChild(userItem);
-                
-                // 添加删除用户事件
-                if (userItem.querySelector('.delete-user-btn')) {
-                    userItem.querySelector('.delete-user-btn').addEventListener('click', (e) => {
-                        if (confirm('确定要删除此用户吗？所有文件和数据都将被永久删除。')) {
-                            const username = e.currentTarget.getAttribute('data-username');
-                            deleteUser(username);
-                        }
-                    });
-                }
-                
-                // 添加查看用户文件事件
-                userItem.querySelector('.view-user-files-btn').addEventListener('click', (e) => {
-                    const username = e.currentTarget.getAttribute('data-username');
-                    alert(`查看用户 ${username} 的文件（实际应用中会显示用户的所有文件）`);
-                });
-            });
-        }
-
-        // 删除用户（管理员功能）
-        function deleteUser(username) {
-            if (users[username]) {
-                // 删除用户的所有公共文件
-                publicFiles = publicFiles.filter(item => item.owner !== username);
-                savePublicFiles();
-                
-                // 从其他用户的好友列表中移除
-                Object.keys(users).forEach(user => {
-                    if (users[user].friends && users[user].friends.includes(username)) {
-                        users[user].friends = users[user].friends.filter(f => f !== username);
-                    }
-                    
-                    // 从私聊记录中删除
-                    if (users[user].privateChats && users[user].privateChats[username]) {
-                        delete users[user].privateChats[username];
-                    }
-                });
-                
-                // 删除用户
-                delete users[username];
-                saveUsersData();
-                
-                // 如果删除的是当前登录用户，退出登录
-                if (currentUser === username) {
-                    logout();
-                }
-                
-                // 更新UI
-                renderUsersList();
-                renderPublicFiles();
-            }
-        }
-
-        // 添加好友
-        function addFriend() {
-            const friendUsername = document.getElementById('friend-username').value.trim();
-            
-            if (!friendUsername) {
-                alert('请输入好友用户名');
-                return;
-            }
-            
-            if (friendUsername === currentUser) {
-                alert('不能添加自己为好友');
-                return;
-            }
-            
-            if (!users[friendUsername]) {
-                alert('用户不存在');
-                return;
-            }
-            
-            if (users[currentUser].friends.includes(friendUsername)) {
-                alert('已经是好友了');
-                return;
-            }
-            
-            // 添加好友
-            users[currentUser].friends.push(friendUsername);
-            saveUsersData();
-            
-            // 刷新好友列表
-            renderFriends();
-            
-            // 清空输入
-            document.getElementById('friend-username').value = '';
-            
-            alert(`已添加 ${friendUsername} 为好友`);
-        }
-
-        // 渲染好友列表
-        function renderFriends() {
-            const friendsList = document.getElementById('friends-list');
-            const chatFriendSelect = document.getElementById('chat-friend-select');
-            
-            friendsList.innerHTML = '';
-            chatFriendSelect.innerHTML = '<option value="">选择聊天对象</option>';
-            
-            if (users[currentUser].friends.length === 0) {
-                friendsList.innerHTML = '<p class="text-gray-500">暂无好友</p>';
-                return;
-            }
-            
-            users[currentUser].friends.forEach(friend => {
-                // 添加到好友列表
-                const friendItem = document.createElement('div');
-                friendItem.className = 'friend-item';
-                friendItem.innerHTML = `
-                    <div class="flex items-center">
-                        <img src="${users[friend]?.avatar || 'https://picsum.photos/50/50'}" alt="${friend}的头像" class="w-6 h-6 rounded-full mr-2">
-                        <span>${friend}</span>
-                    </div>
-                    <button class="chat-with-friend-btn bg-blue-600 hover:bg-blue-700 text-white p-1 rounded-md text-sm" data-friend="${friend}">
-                        聊天
-                    </button>
-                `;
-                friendsList.appendChild(friendItem);
-                
-                // 添加到聊天选择框
-                const option = document.createElement('option');
-                option.value = friend;
-                option.textContent = friend;
-                chatFriendSelect.appendChild(option);
-                
-                // 添加聊天事件
-                friendItem.querySelector('.chat-with-friend-btn').addEventListener('click', (e) => {
-                    const friendName = e.currentTarget.getAttribute('data-friend');
-                    chatFriendSelect.value = friendName;
-                    loadPrivateChat();
-                });
-            });
-        }
-
-        // 渲染登录记录
-        function renderLoginHistory() {
-            const loginHistory = document.getElementById('login-history');
-            loginHistory.innerHTML = '';
-            
-            if (users[currentUser].loginHistory.length === 0) {
-                loginHistory.innerHTML = '<p class="text-gray-500">暂无登录记录</p>';
-                return;
-            }
-            
-            users[currentUser].loginHistory.forEach(record => {
-                const recordItem = document.createElement('div');
-                recordItem.className = 'border border-gray-300 p-2 rounded-md';
-                recordItem.innerHTML = `
-                    <p>时间: ${record.time}</p>
-                    <p class="text-sm text-gray-500">IP: ${record.ip}</p>
-                `;
-                loginHistory.appendChild(recordItem);
-            });
-        }
-
-        // 发送公共聊天消息
-        function sendPublicChat() {
-            const messageInput = document.getElementById('public-chat-input');
-            const message = messageInput.value.trim();
-            
-            if (!message) return;
-            
-            // 创建消息对象
-            const chatMessage = {
-                user: currentUser,
-                message: message,
-                time: new Date().toISOString()
-            };
-            
-            // 添加到公共聊天
-            publicChatMessages.unshift(chatMessage);
-            
-            // 限制消息数量
-            if (publicChatMessages.length > 200) {
-                publicChatMessages.pop();
-            }
-            
-            // 保存消息
-            savePublicChatMessages();
-            
-            // 渲染公共聊天
-            renderPublicChat();
-            
-            // 清空输入
-            messageInput.value = '';
-        }
-
-        // 渲染公共聊天
-        function renderPublicChat() {
-            const chatMessages = document.getElementById('public-chat-messages');
-            const scrollPosition = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 10;
-            
-            chatMessages.innerHTML = '';
-            
-            if (publicChatMessages.length === 0) {
-                chatMessages.innerHTML = '<p class="text-gray-500">暂无消息</p>';
-                return;
-            }
-            
-            publicChatMessages.forEach(msg => {
-                const messageItem = document.createElement('div');
-                const time = new Date(msg.time).toLocaleTimeString();
-                messageItem.innerHTML = `
-                    <div class="flex items-start">
-                        <img src="${users[msg.user]?.avatar || 'https://picsum.photos/30/30'}" alt="${msg.user}的头像" class="w-6 h-6 rounded-full mr-2 mt-1">
-                        <div>
-                            <strong>${msg.user}</strong> <span class="text-xs text-gray-500">${time}</span>
-                            <p>${msg.message}</p>
-                        </div>
-                    </div>
-                `;
-                chatMessages.appendChild(messageItem);
-            });
-            
-            // 如果之前在底部，保持在底部
-            if (scrollPosition) {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        // 发送私聊消息
-        function sendPrivateChat() {
-            const friend = document.getElementById('chat-friend-select').value;
-            const messageInput = document.getElementById('private-chat-input');
-            const message = messageInput.value.trim();
-            
-            if (!friend || !message) return;
-            
-            // 确保私聊对象存在
-            if (!users[currentUser].privateChats[friend]) {
-                users[currentUser].privateChats[friend] = [];
-            }
-            
-            // 创建消息对象
-            const chatMessage = {
-                sender: currentUser,
-                message: message,
-                time: new Date().toISOString()
-            };
-            
-            // 添加到私聊记录
-            users[currentUser].privateChats[friend].push(chatMessage);
-            
-            // 保存数据
-            saveUsersData();
-            
-            // 重新加载私聊
-            loadPrivateChat();
-            
-            // 清空输入
-            messageInput.value = '';
-        }
-
-        // 加载私聊记录
-        function loadPrivateChat() {
-            const friend = document.getElementById('chat-friend-select').value;
-            const chatMessages = document.getElementById('private-chat-messages');
-            
-            chatMessages.innerHTML = '';
-            
-            if (!friend) {
-                chatMessages.innerHTML = '<p class="text-gray-500">请选择聊天对象</p>';
-                return;
-            }
-            
-            // 确保私聊对象存在
-            if (!users[currentUser].privateChats[friend]) {
-                users[currentUser].privateChats[friend] = [];
-                chatMessages.innerHTML = '<p class="text-gray-500">暂无聊天记录</p>';
-                return;
-            }
-            
-            // 显示聊天记录
-            users[currentUser].privateChats[friend].forEach(msg => {
-                const messageItem = document.createElement('div');
-                const time = new Date(msg.time).toLocaleTimeString();
-                const isCurrentUser = msg.sender === currentUser;
-                const alignment = isCurrentUser ? 'justify-end' : 'justify-start';
-                
-                messageItem.innerHTML = `
-                    <div class="flex ${alignment}">
-                        <div class="${isCurrentUser ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} p-2 rounded-md max-w-[80%]">
-                            <strong>${msg.sender}</strong> <span class="text-xs text-gray-500">${time}</span>
-                            <p>${msg.message}</p>
-                        </div>
-                    </div>
-                `;
-                chatMessages.appendChild(messageItem);
-            });
-            
-            // 滚动到底部
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // 更新容量显示
-        function updateCapacityDisplay() {
-            const capacityDisplay = document.getElementById('capacity-display');
-            capacityDisplay.textContent = `已使用 ${users[currentUser].usedCapacity.toFixed(2)}GB，总容量 1TB`;
-        }
-
-        // 切换主题
-        function toggleTheme() {
-            const isDarkMode = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateThemeIcon(isDarkMode);
-        }
-
-        // 更新主题图标
-        function updateThemeIcon(isDarkMode) {
-            if (isDarkMode) {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                userThemeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                userThemeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        // 保存用户数据
-        function saveUsersData() {
-            localStorage.setItem('cloudUsers', JSON.stringify(users));
-        }
-
-        // 保存公共文件
-        function savePublicFiles() {
-            localStorage.setItem('publicFiles', JSON.stringify(publicFiles));
-        }
-
-        // 保存公共聊天消息
-        function savePublicChatMessages() {
-            localStorage.setItem('publicChatMessages', JSON.stringify(publicChatMessages));
-        }
-
-        // 保存分类
-        function saveCategories() {
-            localStorage.setItem('categories', JSON.stringify(categories));
-        }
-    </script>
 </body>
-
 </html>
